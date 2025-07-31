@@ -771,7 +771,7 @@ class ScaffoldedSampler(SelfConditioning):
         else:
             # initialize BlockAdjacency sampling class
             assert all(x is None for x in (conf.contigmap.inpaint_str_helix, conf.contigmap.inpaint_str_strand, conf.contigmap.inpaint_str_loop)), "can't provide scaffold_dir if you're also specifying per-residue ss"
-            self.blockadjacency = iu.BlockAdjacency(conf.scaffoldguided, conf.inference.num_designs)
+            self.blockadjacency = iu.BlockAdjacency(conf, conf.inference.num_designs)
 
 
         #################################################
@@ -899,6 +899,11 @@ class ScaffoldedSampler(SelfConditioning):
                 self.ss=iu.ss_from_contig(self.contig_map.ss_spec)
             assert L_mapped==self.adj.shape[0]
             
+        #######################################
+        ### Resolve cyclic peptide indicies ###
+        #######################################
+        self.cyclic_reses = torch.zeros_like(self.mask_str).bool().to(self.device).squeeze()
+
         ####################
         ### Get hotspots ###
         ####################
